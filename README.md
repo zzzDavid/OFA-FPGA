@@ -190,6 +190,19 @@ kernel list info for network "proxylessmobile05"
 
 ### Deploy model on FPGA
 
+```sh
+$ git clone https://github.com/zzzDavid/DPU-Profiling
+```
+
+```sh
+$ python to_so.py
+$ cp ./so/* /usr/lib
+```
+
+```sh
+$ python3 latency.py
+```
+
 <details>
 <summary>Latency Profiling Result</summary>
 
