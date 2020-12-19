@@ -20,56 +20,58 @@ This documentation is a detailed guide to quantize, compile, deploy, and measure
 
 <details>
 <summary>DPU Configuration</summary>
-<code>
+
+```text
 [DPU IP Spec]
-IP  Timestamp            : 2019-11-18 18:45:00 <br>
-DPU Core Count           : 3 <br>
+IP  Timestamp            : 2019-11-18 18:45:00
+DPU Core Count           : 3
 
-[DPU Core Configuration List]<br>
-DPU Core                 : #0<br>
-DPU Enabled              : Yes<br>
-DPU Arch                 : B4096<br>
-DPU Target Version       : v1.4.0<br>
-DPU Freqency             : 300 MHz<br>
-Ram Usage                : Low<br>
-DepthwiseConv            : Enabled<br>
-DepthwiseConv+Relu6      : Enabled<br>
-Conv+Leakyrelu           : Enabled<br>
-Conv+Relu6               : Enabled<br>
-Channel Augmentation     : Enabled<br>
-Average Pool             : Enabled<br>
-<br>
-DPU Core                 : #1<br>
-DPU Enabled              : Yes<br>
-DPU Arch                 : B4096<br>
-DPU Target Version       : v1.4.0<br>
-DPU Freqency             : 300 MHz<br>
-Ram Usage                : Low<br>
-DepthwiseConv            : Enabled<br>
-DepthwiseConv+Relu6      : Enabled<br>
-Conv+Leakyrelu           : Enabled<br>
-Conv+Relu6               : Enabled<br>
-Channel Augmentation     : Enabled<br>
-Average Pool             : Enabled<br>
-<br>
-DPU Core                 : #2<br>
-DPU Enabled              : Yes<br>
-DPU Arch                 : B4096<br>
-DPU Target Version       : v1.4.0<br>
-DPU Freqency             : 300 MHz<br>
-Ram Usage                : Low<br>
-DepthwiseConv            : Enabled<br>
-DepthwiseConv+Relu6      : Enabled<br>
-Conv+Leakyrelu           : Enabled<br>
-Conv+Relu6               : Enabled<br>
-Channel Augmentation     : Enabled<br>
-Average Pool             : Enabled<br>
-<br>
+[DPU Core Configuration List]
+DPU Core                 : #0
+DPU Enabled              : Yes
+DPU Arch                 : B4096
+DPU Target Version       : v1.4.0
+DPU Freqency             : 300 MHz
+Ram Usage                : Low
+DepthwiseConv            : Enabled
+DepthwiseConv+Relu6      : Enabled
+Conv+Leakyrelu           : Enabled
+Conv+Relu6               : Enabled
+Channel Augmentation     : Enabled
+Average Pool             : Enabled
 
-[DPU Extension List]<br>
-Extension Softmax<br>
-Enabled                  : Yes<br>
-</code>
+DPU Core                 : #1
+DPU Enabled              : Yes
+DPU Arch                 : B4096
+DPU Target Version       : v1.4.0
+DPU Freqency             : 300 MHz
+Ram Usage                : Low
+DepthwiseConv            : Enabled
+DepthwiseConv+Relu6      : Enabled
+Conv+Leakyrelu           : Enabled
+Conv+Relu6               : Enabled
+Channel Augmentation     : Enabled
+Average Pool             : Enabled
+
+DPU Core                 : #2
+DPU Enabled              : Yes
+DPU Arch                 : B4096
+DPU Target Version       : v1.4.0
+DPU Freqency             : 300 MHz
+Ram Usage                : Low
+DepthwiseConv            : Enabled
+DepthwiseConv+Relu6      : Enabled
+Conv+Leakyrelu           : Enabled
+Conv+Relu6               : Enabled
+Channel Augmentation     : Enabled
+Average Pool             : Enabled
+
+
+[DPU Extension List]
+Extension Softmax
+Enabled                  : Yes
+```
+
 </details>
 
 ## Install Dependencies
