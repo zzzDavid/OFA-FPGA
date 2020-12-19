@@ -4,7 +4,7 @@
 This documentation is a detailed guide to quantize, compile, deploy, and measure latency of Once-For-All networks on Xilinx ZCU102 board running DPU. The models that are successfully deployed on Xilinx DPU are listed in the following table. 
 
 | Model | Top-1 Accuracy | Top-5 Accuracy | FLOPs | #Param | Latency (DPU) |
-|:-----:|:--------------:|:--------------:|:-----:|:------:|:--------|
+|:-----:|:--------------:|:--------------:|:-----:|:------:|:-------------:|
 | Proxyless-Mobile 0.5|  58.848|  81.664  | 103.6M  |  2.2M   |  3.279 ms | 
 
 
@@ -12,7 +12,7 @@ This documentation is a detailed guide to quantize, compile, deploy, and measure
 
 [1. Pre-requisites](#pre-requisites)
 
-[2. Install Dependencies](#dependency)
+[2. Install Dependencies](#install-dependencies)
 
 [3. Steps to deploy OFA networks on FPGA](#steps-to-deploy-ofa-networks-on-fpga)
 
@@ -98,26 +98,55 @@ To convert original OFA models implemented in PyTorch to Caffe framework, we pro
 
 To install this tool, we recommend using `conda` for Python environment management.
 
+```sh
+$ conda create -n deploy python=3.7
+```
+
+Install `pytorch2caffe` python package:
+```sh
+$ git clone https://github.com/zzzDavid/pytorch2caffe
+$ cd pytorch2caffe
+$ pip install .
+```
 
 ### Vitis-AI: Quantization and Compilation Tool
-
-
-### Measure Latency
 
 
 ## Steps to deploy OFA networks on FPGA
 
 ### Export Caffe model
 
-### Quantization
-
 1. Prepare calibration dataset
 
 Calibration dataset: [imagenet_calib.zip (Google Drive)](https://drive.google.com/file/d/1KZE10LXRQCSJuK9d7xErDOjTjUj4fHyi/view?usp=sharing)
 
+```sh
+$ ./run.sh
+```
 
+### Quantization
+
+```sh
+$ vai_q_caffe quantize                                     \
+    -model ./caffe_nets/proxylessmobile05.prototxt         \
+    -weights ./caffe_nets/proxylessmobile05.caffemodel     \
+    --calib_iter 100                                       \
+    --gpu 0                                                \
+    --output_dir ./caffe_nets/proxylessmobile05/quantize_results
+```
 
 ### Compilation
+
+```sh
+vai_c_caffe                                                             \
+    -p ./caffe_nets/proxylessmobile05/quantize_results/deploy.prototxt  \
+    -c ./quantize_results/deploy.caffemodel                             \
+    -a /opt/vitis_ai/compiler/arch/dpuv2/ZCU102/ZCU102.json             \
+    -e  "{'mode': 'debug'}"                                             \
+    --output_dir ./compiled                                             \
+    -n proxylessmobile05
+```
+
 
 <details>
 <summary>Compiler Output (kernel list)</summary>
