@@ -27,9 +27,9 @@ As the hardware pre-requisite, the DPU TRD needs to be set up first. We recommen
 - [DPU TRD Vitis Flow](https://github.com/Xilinx/Vitis-AI/blob/master/dsa/DPU-TRD/prj/Vitis/README.md)
 - [DPU TRD Vivado Flow](https://github.com/Xilinx/Vitis-AI/blob/master/dsa/DPU-TRD/prj/Vivado/README.md)
 
-
+The DPU configuration used in this documentation (checked with `dexplorer -w`): 
 <details>
-<summary>DPU Configuration (checked with `dexplorer -w`)</summary>
+<summary>DPU Configuration</summary>
 
 ```text
 [DPU IP Spec]
@@ -84,9 +84,13 @@ Enabled                  : Yes
 
 </details>
 
+2. Docker installation
+
+We will use Xilinx's Vitis-AI docker container (Linux) to quantize and compile models. Therefore, a valid docker installation is required. The official guide to install docker on a Linux machine: [Install Docker Engine](https://docs.docker.com/engine/install/).
+
 ## Install Dependencies
 
-[Vitis-AI](https://www.xilinx.com/html_docs/vitis_ai/1_2/zkj1576857115470.html) compiler supports Caffe and TensorFlow models for edge device. We choose Caffe compilation workflow because it is well-supported.  
+[Vitis-AI](https://www.xilinx.com/html_docs/vitis_ai/1_2/zkj1576857115470.html) compiler supports Caffe and TensorFlow models for edge device. We choose Caffe compilation workflow because it is well-supported. To compile OFA models, we first export the original model to Caffe version, then we run quantization and compilation with Vitis-AI tools.  
 
 ### `pytorch2caffe`: PyTorch-to-Caffe Conversion Tool
 
@@ -95,7 +99,7 @@ To convert original OFA models implemented in PyTorch to Caffe framework, we pro
 To install this tool, we recommend using `conda` for Python environment management.
 
 
-### `Vitis-AI`: Quantization and Compilation Tool
+### Vitis-AI: Quantization and Compilation Tool
 
 
 ### Measure Latency
