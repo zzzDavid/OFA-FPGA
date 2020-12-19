@@ -20,7 +20,7 @@ This documentation is a detailed guide to quantize, compile, deploy, and measure
 
 <details>
 <summary>DPU Configuration</summary>
-```
+
 [DPU IP Spec]
 IP  Timestamp            : 2019-11-18 18:45:00
 DPU Core Count           : 3
@@ -69,7 +69,7 @@ Average Pool             : Enabled
 [DPU Extension List]
 Extension Softmax
 Enabled                  : Yes
-```
+
 </details>
 
 ## Install Dependencies
