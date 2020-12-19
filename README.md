@@ -120,7 +120,7 @@ To install Vitis-AI-Tools:
 $ docker pull xilinx/vitis-ai:tools-1.0.0-cpu
 ```
 
-> Vitis GPU docker is currently not available. This is because legal is working on the license for GPU software in the GPU container. Hopefully it will get resolved soon. [link](https://forums.xilinx.com/t5/AI-and-Vitis-AI/Vitis-AI-Can-not-download-GPU-tools-container/td-p/1051257)
+> Vitis GPU docker is currently not available. This is because legal issues with the license for GPU software in the GPU container. Hopefully it will get resolved soon. [report link](https://forums.xilinx.com/t5/AI-and-Vitis-AI/Vitis-AI-Can-not-download-GPU-tools-container/td-p/1051257)
 
 To start a docker container:
 ```sh
@@ -178,8 +178,8 @@ $ conda activate vitis-ai-caffe
 Once the environment is ready, simply run:
 ```sh
 $ vai_q_caffe quantize                                     \
-    -model ./caffe_nets/proxylessmobile05.prototxt         \
-    -weights ./caffe_nets/proxylessmobile05.caffemodel     \
+    --model ./caffe_nets/proxylessmobile05.prototxt        \
+    --weights ./caffe_nets/proxylessmobile05.caffemodel    \
     --calib_iter 100                                       \
     --gpu 0                                                \
     --output_dir ./caffe_nets/proxylessmobile05/quantize_results
@@ -192,7 +192,7 @@ After quantization, we proceed to compilation. The compilation tool uses the sam
 
 Simply run:
 ```sh
-$ vai_c_caffe                                                             \
+$ vai_c_caffe                                                           \
     -p ./caffe_nets/proxylessmobile05/quantize_results/deploy.prototxt  \
     -c ./quantize_results/deploy.caffemodel                             \
     -a /opt/vitis_ai/compiler/arch/dpuv2/ZCU102/ZCU102.json             \
