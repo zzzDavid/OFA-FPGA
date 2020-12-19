@@ -1,7 +1,7 @@
 # A Guide to deploy Once-For-All networks on Xilinx DPU
 
 ## Introduction
-This documentation is a detailed guide to quantize, compile, deploy, and measure latency of Once-For-All networks on Xilinx ZCU102 board running DPU. The models that are successfully deployed on Xilinx DPU are listed in the following table. 
+This documentation is a detailed guide to quantize, compile, deploy, and measure the latency of Once-For-All Proxyless search space networks on Xilinx ZCU102 board running DPU. The models that are successfully deployed on Xilinx DPU are listed in the following table. 
 
 | Model | Top-1 Accuracy | Top-5 Accuracy | FLOPs | #Param | Latency (DPU) |
 |:-----:|:--------------:|:--------------:|:-----:|:------:|:-------------:|
@@ -111,6 +111,7 @@ $ pip install .
 
 ### Vitis-AI: Quantization and Compilation Tool
 
+Vitis-AI version needs to be compatible with DPU TRD.
 
 ## Steps to deploy OFA networks on FPGA
 
@@ -120,8 +121,20 @@ $ pip install .
 
 Calibration dataset: [imagenet_calib.zip (Google Drive)](https://drive.google.com/file/d/1KZE10LXRQCSJuK9d7xErDOjTjUj4fHyi/view?usp=sharing)
 
+2. Export ProxylessNAS net to Caffe model
 ```sh
+$ git clone https://github.com/mit-han-lab/proxylessnas.git
+$ cd proxylessnas/deploy
 $ ./run.sh
+```
+
+```sh
+SOURCE="/home/user/imagenet_calib/calibration.txt"
+ROOT="/home/user/imagenet_calib/img/"
+INPUT_SIZE=224
+IMAGENET="/home/user/imagenet"
+GPU=0
+ARCH="proxyless_mobile_05"
 ```
 
 ### Quantization
@@ -138,7 +151,7 @@ $ vai_q_caffe quantize                                     \
 ### Compilation
 
 ```sh
-vai_c_caffe                                                             \
+$ vai_c_caffe                                                             \
     -p ./caffe_nets/proxylessmobile05/quantize_results/deploy.prototxt  \
     -c ./quantize_results/deploy.caffemodel                             \
     -a /opt/vitis_ai/compiler/arch/dpuv2/ZCU102/ZCU102.json             \
@@ -146,6 +159,9 @@ vai_c_caffe                                                             \
     --output_dir ./compiled                                             \
     -n proxylessmobile05
 ```
+
+**Notice**:
+`quantize_results/deploy.prototxt` might contain a redundant input layer. In that case, please remove the redundant input layer before compilation.
 
 
 <details>
@@ -187,6 +203,24 @@ kernel list info for network "proxylessmobile05"
 ```
 
 </details>
+
+#### Quantize and Compile models in batch
+
+Alternatively, we provide a batch compilation tool to automate the quantization and compilation process.
+To run the auto-compilation tool:
+
+```sh
+$ git clone https://github.com/zzzDavid/vitis-compile
+$ cd vitis-compile
+$ ./run.sh
+```
+
+```sh
+SOURCE="/home/user/proxylessnas/deploy/caffe_nets"
+RESULT="/home/user/proxylessnas/deploy/compiled"
+GPU=0
+```
+
 
 ### Deploy model on FPGA
 
