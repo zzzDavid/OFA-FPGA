@@ -3,9 +3,9 @@
 ## Introduction
 This documentation is a detailed guide to quantize, compile, deploy, and measure latency of Once-For-All networks on Xilinx ZCU102 board running DPU. The models that are successfully deployed on Xilinx DPU are listed in the following table. 
 
-| Model | Top-1 Accuracy | FLOPs | #Param | Latency |
-|:-----:|:--------------:|:-----:|:------:|:--------|
-| Proxyless-Mobile 0.5|  |    |   |     |   | 
+| Model | Top-1 Accuracy | Top-5 Accuracy | FLOPs | #Param | Latency (DPU) |
+|:-----:|:--------------:|:--------------:|:-----:|:------:|:--------|
+| Proxyless-Mobile 0.5|  58.848|  81.664  | 103.6M  |  2.2M   |  3.279 ms | 
 
 
 ## Table of Content
@@ -119,8 +119,104 @@ Calibration dataset: [imagenet_calib.zip (Google Drive)](https://drive.google.co
 
 ### Compilation
 
+<details>
+<summary>Compiler Output (kernel list)</summary>
+
+```text
+kernel list info for network "proxylessmobile05"
+                               Kernel ID : Name
+                                       0 : proxylessmobile05
+
+                             Kernel Name : proxylessmobile05
+--------------------------------------------------------------------------------
+                             Kernel Type : DPUKernel
+                               Code Size : 0.17MB
+                              Param Size : 2.06MB
+                           Workload MACs : 207.17MOPS
+                         IO Memory Space : 0.34MB
+                              Mean Value : 0, 0, 0, 
+                      Total Tensor Count : 43
+                Boundary Input Tensor(s)   (H*W*C)
+               default_name_input_1:0(0) : 224*224*3
+
+               Boundary Output Tensor(s)   (H*W*C)
+             proxylessmobile05_fc_1:0(0) : 1*1*1000
+
+                        Total Node Count : 42
+                           Input Node(s)   (H*W*C)
+             proxylessmobile05_conv_1(0) : 224*224*3
+
+                          Output Node(s)   (H*W*C)
+               proxylessmobile05_fc_1(0) : 1*1*1000
+
+
+
+
+**************************************************
+* VITIS_AI Compilation - Xilinx Inc.
+**************************************************
+```
+
+</details>
+
 ### Deploy model on FPGA
 
+<details>
+<summary>Latency Profiling Result</summary>
+
+```text
+=====================================================================================================
+[DNNDK] Performance profile - DPU Kernel "proxylessmobile05" DPU Task "proxylessmobile05-0"
+=====================================================================================================
+  ID                       NodeName Workload(MOP) Mem(MB) RunTime(ms) Perf(GOPS) Utilization    MB/S
+   1       proxylessmobile05_conv_1        14.451    0.34       0.134      107.8         8.8%  2550.7
+   2       proxylessmobile05_conv_3         3.211    0.29       0.063       51.0         4.1%  4620.3
+   3       proxylessmobile05_conv_4         8.580    0.17       0.173       49.6         4.0%   994.7
+   4       proxylessmobile05_conv_6         2.408    0.12       0.037       65.1         5.3%  3300.8
+   5       proxylessmobile05_conv_7         7.526    0.20       0.106       71.0         5.8%  1847.4
+   6       proxylessmobile05_conv_9         4.817    0.24       0.060       80.3         6.5%  4071.0
+   7      proxylessmobile05_conv_10         8.505    0.09       0.133       63.9         5.2%   672.4
+   8      proxylessmobile05_conv_12         1.806    0.06       0.025       72.3         5.9%  2255.1
+   9      proxylessmobile05_conv_13         3.726    0.08       0.061       61.1         5.0%  1258.0
+  10      proxylessmobile05_conv_15         2.710    0.09       0.036       75.3         6.1%  2607.9
+  11      proxylessmobile05_conv_16         5.532    0.08       0.114       48.5         3.9%   682.8
+  12      proxylessmobile05_conv_18         2.710    0.09       0.037       73.2         6.0%  2537.4
+  13      proxylessmobile05_conv_19         5.532    0.08       0.114       48.5         3.9%   682.8
+  14      proxylessmobile05_conv_21         2.710    0.09       0.037       73.2         6.0%  2537.4
+  15      proxylessmobile05_conv_22         8.185    0.06       0.131       62.5         5.1%   449.3
+  16      proxylessmobile05_conv_24         2.258    0.04       0.024       94.1         7.7%  1713.6
+  17      proxylessmobile05_conv_25         3.058    0.04       0.068       45.0         3.7%   592.9
+  18      proxylessmobile05_conv_27         1.882    0.04       0.028       67.2         5.5%  1562.0
+  19      proxylessmobile05_conv_28         3.058    0.04       0.068       45.0         3.7%   592.9
+  20      proxylessmobile05_conv_30         1.882    0.04       0.028       67.2         5.5%  1562.0
+  21      proxylessmobile05_conv_31         3.058    0.04       0.069       44.3         3.6%   584.3
+  22      proxylessmobile05_conv_33         1.882    0.04       0.027       69.7         5.7%  1619.8
+  23      proxylessmobile05_conv_34         6.115    0.07       0.118       51.8         4.2%   614.5
+  24      proxylessmobile05_conv_36         4.516    0.07       0.028      161.3        13.1%  2363.9
+  25      proxylessmobile05_conv_37         4.121    0.05       0.077       53.5         4.4%   640.7
+  26      proxylessmobile05_conv_39         2.710    0.05       0.028       96.8         7.9%  1905.6
+  27      proxylessmobile05_conv_40         4.121    0.05       0.079       52.2         4.2%   624.5
+  28      proxylessmobile05_conv_42         2.710    0.05       0.029       93.4         7.6%  1839.9
+  29      proxylessmobile05_conv_43         4.121    0.05       0.078       52.8         4.3%   632.5
+  30      proxylessmobile05_conv_45         2.710    0.05       0.029       93.4         7.6%  1839.9
+  31      proxylessmobile05_conv_46         6.802    0.06       0.107       63.6         5.2%   515.6
+  32      proxylessmobile05_conv_48         2.710    0.05       0.028       96.8         7.9%  1651.1
+  33      proxylessmobile05_conv_49         8.185    0.12       0.183       44.7         3.6%   666.5
+  34      proxylessmobile05_conv_51         5.419    0.09       0.035      154.8        12.6%  2594.5
+  35      proxylessmobile05_conv_52         4.092    0.06       0.101       40.5         3.3%   627.7
+  36      proxylessmobile05_conv_54         2.710    0.05       0.032       84.7         6.9%  1593.2
+  37      proxylessmobile05_conv_55         4.092    0.06       0.099       41.3         3.4%   640.4
+  38      proxylessmobile05_conv_57         2.710    0.05       0.030       90.3         7.3%  1699.4
+  39      proxylessmobile05_conv_58         8.185    0.12       0.182       45.0         3.7%   670.2
+  40      proxylessmobile05_conv_60         9.032    0.13       0.038      237.7        19.3%  3297.8
+  41      proxylessmobile05_conv_61        20.070    0.23       0.170      118.1         9.6%  1332.2
+  42         proxylessmobile05_fc_1         2.560    1.24       0.235       10.9         0.9%  5278.4
+
+                Total Nodes In Avg:
+                                All       207.171    5.33       3.279       63.2         5.1%  1625.5
+=====================================================================================================
+```
+</details>
 
 ## References
 
