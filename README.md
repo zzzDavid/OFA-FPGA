@@ -1,11 +1,11 @@
 # A Guide to deploy Once-For-All networks on Xilinx DPU
 
 ## Introduction
-This documentation is a detailed guide to quantize, compile, deploy, and measure the latency of Once-For-All Proxyless search space networks on Xilinx ZCU102 board running DPU. The models that are successfully deployed on Xilinx DPU are listed in the following table. 
+This documentation is a detailed guide to quantize, compile, deploy, and measure the latency of Once-For-All Proxyless search space networks on Xilinx ZCU102 board running DPU. The successfully deployed models on Xilinx DPU are listed in the following table. 
 
-| Model | Top-1 Accuracy | Top-5 Accuracy | FLOPs | #Param | Latency (DPU) |
+| Model | Top-1 Accuracy | Top-5 Accuracy | FLOPs | #Params| Latency (DPU) |
 |:-----:|:--------------:|:--------------:|:-----:|:------:|:-------------:|
-| Proxyless-Mobile 0.5|  58.848|  81.664  | 103.6M  |  2.2M   |  3.279 ms | 
+| Proxyless-Mobile 0.5|  58.848% |  81.664%  | 103.6M  |  2.2M   |  3.279 ms | 
 
 
 ## Table of Content
@@ -90,7 +90,7 @@ We will use Xilinx's Vitis-AI docker container (Linux) to quantize and compile m
 
 ## Install Dependencies
 
-[Vitis-AI](https://www.xilinx.com/html_docs/vitis_ai/1_2/zkj1576857115470.html) compiler supports Caffe and TensorFlow models for edge device. We choose Caffe compilation workflow because it is well-supported. To compile OFA models, we first export the original model to Caffe version, then we run quantization and compilation with Vitis-AI tools.  
+[Vitis-AI](https://www.xilinx.com/html_docs/vitis_ai/1_2/zkj1576857115470.html) compiler supports Caffe and TensorFlow models for edge devices. We choose Caffe compilation workflow because it is well-supported. To compile OFA models, we first export the original model to Caffe version, then we run quantization and compilation with Vitis-AI tools.  
 
 ### `pytorch2caffe`: PyTorch-to-Caffe Conversion Tool
 
@@ -111,7 +111,26 @@ $ pip install .
 
 ### Vitis-AI: Quantization and Compilation Tool
 
-Vitis-AI version needs to be compatible with DPU TRD.
+Vitis-AI version needs to be compatible with DPU TRD. For DPU v1.4.0, one should use docker image `vitis-ai-1.0.0`.
+
+Vitis-AI docker hub page: [DockerHub](https://hub.docker.com/r/xilinx/vitis-ai/tags?page=1&ordering=last_updated)
+
+To install Vitis-AI-Tools:
+```sh
+$ docker pull xilinx/vitis-ai:tools-1.0.0-cpu
+```
+
+> Vitis GPU docker is currently not available. This is because legal is working on the license for GPU software in the GPU container. Hopefully it will get resolved soon. [link](https://forums.xilinx.com/t5/AI-and-Vitis-AI/Vitis-AI-Can-not-download-GPU-tools-container/td-p/1051257)
+
+To start a docker container:
+```sh
+$ docker run -it                                                  \
+    --runtime=nvidia                                              \
+    --name=vitis                                                  \
+    -v /home/user/:/home/user/                                    \
+    xilin/vitis-ai:tools-1.0.0-cpu                                \
+    /bin/bash 
+```
 
 ## Steps to deploy OFA networks on FPGA
 
@@ -119,7 +138,9 @@ Vitis-AI version needs to be compatible with DPU TRD.
 
 1. Prepare calibration dataset
 
-Calibration dataset: [imagenet_calib.zip (Google Drive)](https://drive.google.com/file/d/1KZE10LXRQCSJuK9d7xErDOjTjUj4fHyi/view?usp=sharing)
+Quantization often needs a calibration dataset. We randomly sampled 100 images from imagenet validation dataset, and organized them into the calibration dataset.
+
+The off-the-shelf calibration dataset: [imagenet_calib.zip (Google Drive)](https://drive.google.com/file/d/1KZE10LXRQCSJuK9d7xErDOjTjUj4fHyi/view?usp=sharing)
 
 2. Export ProxylessNAS net to Caffe model
 ```sh
@@ -127,18 +148,34 @@ $ git clone https://github.com/mit-han-lab/proxylessnas.git
 $ cd proxylessnas/deploy
 $ ./run.sh
 ```
-
+There are a few arguments to set in the `run.sh` script:
 ```sh
-SOURCE="/home/user/imagenet_calib/calibration.txt"
-ROOT="/home/user/imagenet_calib/img/"
-INPUT_SIZE=224
-IMAGENET="/home/user/imagenet"
-GPU=0
-ARCH="proxyless_mobile_05"
+SOURCE="/home/user/imagenet_calib/calibration.txt"  # calibration image list
+ROOT="/home/user/imagenet_calib/img/"               # calibration image directory
+INPUT_SIZE=224                                      # input size
+IMAGENET="/home/user/imagenet"                      # imagenet directory
+GPU=0                                               # gpu number
+ARCH="proxyless_mobile_05"                          # the model to deploy
 ```
+
+The script calls `export_caffe.py`, which uses `pytorch2caffe` to convert target model and report accuracy, #params, and FLOPs.
+
+The exported caffe model will be saved at `./caffe_nets` folder.
 
 ### Quantization
 
+To quantize the model, first enter the docker container by:
+```sh
+$ docker exec -ti vitis /bin/bash
+```
+`vitis` is the container's name that we specified at its creation.
+
+Then, activate the Caffe conda environment:
+```sh
+$ conda activate vitis-ai-caffe
+```
+
+Once the environment is ready, simply run:
 ```sh
 $ vai_q_caffe quantize                                     \
     -model ./caffe_nets/proxylessmobile05.prototxt         \
@@ -147,9 +184,13 @@ $ vai_q_caffe quantize                                     \
     --gpu 0                                                \
     --output_dir ./caffe_nets/proxylessmobile05/quantize_results
 ```
+The quantized caffe models will be saved at `./caffe_nets/proxylessmobile05/quantize_results`.
 
 ### Compilation
 
+After quantization, we proceed to compilation. The compilation tool uses the same environment as the previous step.
+
+Simply run:
 ```sh
 $ vai_c_caffe                                                             \
     -p ./caffe_nets/proxylessmobile05/quantize_results/deploy.prototxt  \
@@ -163,9 +204,12 @@ $ vai_c_caffe                                                             \
 **Notice**:
 `quantize_results/deploy.prototxt` might contain a redundant input layer. In that case, please remove the redundant input layer before compilation.
 
+After quantization, the kernel information is printed as following. 
 
 <details>
 <summary>Compiler Output (kernel list)</summary>
+
+The compiled model is saved at `./compiled/dpu_proxylessmobile05.elf`
 
 ```text
 kernel list info for network "proxylessmobile05"
@@ -215,24 +259,34 @@ $ cd vitis-compile
 $ ./run.sh
 ```
 
+There are three arguments to configure in the script:
+
 ```sh
-SOURCE="/home/user/proxylessnas/deploy/caffe_nets"
-RESULT="/home/user/proxylessnas/deploy/compiled"
+SOURCE="/home/user/proxylessnas/deploy/caffe_nets" # caffe model directory 
+RESULT="/home/user/proxylessnas/deploy/compiled"   # compilation result directory
 GPU=0
 ```
 
+The `*.caffemodel` and `*.prototxt` files should all present in the `SOURCE` folder. 
+All compiled `*.elf` files will be saved in the `RESULT` folder.
 
 ### Deploy model on FPGA
 
+We provide a set of tools to run the models on Xilinx DPU and profile latencies.
+
+On the ZCU102 evaluation board:
 ```sh
 $ git clone https://github.com/zzzDavid/DPU-Profiling
+$ cd DPU-Profiling
+$ mkdir ./elf
 ```
-
+First, download all compiled `*.elf` files to the `./elf` directory.
+Then, convert the `.elf` files to `.so` libraries:
 ```sh
 $ python to_so.py
 $ cp ./so/* /usr/lib
 ```
-
+Finally, execute the following script to run compiled models on DPU and record latencies.
 ```sh
 $ python3 latency.py
 ```
