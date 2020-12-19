@@ -12,9 +12,11 @@ This documentation is a detailed guide to quantize, compile, deploy, and measure
 
 ## Table of Content
 
-[Dependency](#dependency)
-[Steps to deploy OFA networks on FPGA](#steps-to-deploy-ofa-networks-on-fpga)
-[References](#references)
+[- Dependency](#dependency)
+
+[- Steps to deploy OFA networks on FPGA](#steps-to-deploy-ofa-networks-on-fpga)
+
+[- References](#references)
 
 
 ## Dependency
