@@ -10,16 +10,26 @@ This documentation is a detailed guide to quantize, compile, deploy, and measure
 
 ## Table of Content
 
-[- Install Dependencies](#dependency)
+[1. Pre-requisites](#pre-requisites)
 
-[- Steps to deploy OFA networks on FPGA](#steps-to-deploy-ofa-networks-on-fpga)
+[2. Install Dependencies](#dependency)
 
-[- References](#references)
+[3. Steps to deploy OFA networks on FPGA](#steps-to-deploy-ofa-networks-on-fpga)
+
+[4. References](#references)
 
 ## Pre-requisites 
 
+1. Zynq UltraScale+ MPSoC DPU Target Reference Design (TRD)
+ 
+As the hardware pre-requisite, the DPU TRD needs to be set up first. We recommend DPU B4096 version `v1.4.0` for evaluation. The following links are the official guides to set up DPU TRD on ZCU102 board.  
+
+- [DPU TRD Vitis Flow](https://github.com/Xilinx/Vitis-AI/blob/master/dsa/DPU-TRD/prj/Vitis/README.md)
+- [DPU TRD Vivado Flow](https://github.com/Xilinx/Vitis-AI/blob/master/dsa/DPU-TRD/prj/Vivado/README.md)
+
+
 <details>
-<summary>DPU Configuration</summary>
+<summary>DPU Configuration (checked with `dexplorer -w`)</summary>
 
 ```text
 [DPU IP Spec]
